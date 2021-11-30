@@ -6,9 +6,11 @@ es_auth=$(echo -ne "${ES_USER}:${ES_PASSWORD}" | base64 --wrap 0)
 
 # DELETE INDEX
 curl -X DELETE -H "Authorization: Basic ${es_auth}" "${es_index_endpoint}"
+echo "Successfully deleted ${ES_INDEX}."
 
 # CREATE INDEX
 curl -X PUT -H "Authorization: Basic ${es_auth}" "${es_index_endpoint}"
+echo "Successfully created ${ES_INDEX}."
 
 #
 # From https://github.com/elastic/dockerfiles/blob/7.15/logstash/Dockerfile
