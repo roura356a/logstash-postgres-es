@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+es_host="${ES_PROTO}://${ES_ENDPOINT}:${ES_PORT}"
+es_index_endpoint="${es_host}/${ES_INDEX}"
+es_auth=$(echo -ne "${ES_USER}:${ES_PASSWORD}" | base64 --wrap 0)
+
+# DELETE INDEX
+curl -X DELETE -H "Authorization: Basic ${es_auth}" "${es_index_endpoint}"
+
+# CREATE INDEX
+curl -X PUT -H "Authorization: Basic ${es_auth}" "${es_index_endpoint}"
+
+#
+# From https://github.com/elastic/dockerfiles/blob/7.15/logstash/Dockerfile
+env2yaml /usr/share/logstash/config/logstash.yml
+
+export LS_JAVA_OPTS="-Dls.cgroup.cpuacct.path.override=/ -Dls.cgroup.cpu.path.override=/ $LS_JAVA_OPTS"
+
+if [[ -z $1 ]] || [[ ${1:0:1} == '-' ]] ; then
+  exec logstash "$@"
+else
+  exec "$@"
+fi
